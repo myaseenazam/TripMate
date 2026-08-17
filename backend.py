@@ -26,7 +26,7 @@ from langchain_core.messages import (
     AIMessage,
 )
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+
 from tools.tavily_tool import tavily_search
 from tools.flight_tool import search_flights
 
@@ -48,27 +48,19 @@ def get_database_url():
 url = get_database_url()
 print(url)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-if not GEMINI_API_KEY and not GROQ_API_KEY:
-    raise ValueError("You must provide either GEMINI_API_KEY or GROQ_API_KEY in your .env file.")
+if not GROQ_API_KEY:
+    raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file.")
 
 # =========================
 # LLM
 # =========================
 
-if GEMINI_API_KEY:
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-pro",
-        api_key=GEMINI_API_KEY
-    )
-elif GROQ_API_KEY:
-    from langchain_groq import ChatGroq
-    llm = ChatGroq(
-        model=os.getenv("GROQ_MODEL_NAME", "llama-3.3-70b-versatile"),
-        api_key=GROQ_API_KEY
-    )
+from langchain_groq import ChatGroq
+llm = ChatGroq(
+    model=os.getenv("GROQ_MODEL_NAME", "llama-3.3-70b-versatile"),
+    api_key=GROQ_API_KEY
+)
 
 # =========================
 # State

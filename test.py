@@ -19,12 +19,30 @@
 # print("\nFINAL RESPONSE:\n")
 # print(response["answer"])
 
-from langchain_groq import ChatGroq
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-llm = ChatGroq(
-    model="llama3-70b-8192",
-    api_key="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"
-)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-res = llm.invoke("What is the Capital of Pakistan?")
-print(res)
+if GEMINI_API_KEY:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-pro",
+        api_key=GEMINI_API_KEY
+    )
+elif GROQ_API_KEY:
+    from langchain_groq import ChatGroq
+    llm = ChatGroq(
+        model=os.getenv("GROQ_MODEL_NAME", "llama-3.3-70b-versatile"),
+        api_key=GROQ_API_KEY
+    )
+else:
+    raise ValueError("Neither GEMINI_API_KEY nor GROQ_API_KEY found.")
+
+try:
+    res = llm.invoke("What is the Capital of Pakistan?")
+    print(res.content)
+except Exception as e:
+    print("ERROR CALLING GEMINI:", e)
